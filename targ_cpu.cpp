@@ -5,8 +5,6 @@
 #include <qlib/Utils.hpp>
 #include <qlib/LExceptions.hpp>
 
-#include <gsl/gsl_multimin.h>
-#include <gsl/gsl_blas.h>
 
 #include "minimize.hpp"
 #include "mol.hpp"
@@ -35,7 +33,7 @@ void MiniTargCPU::setup(MolData *pMol, DensityMap *pMap)
   m_grad.resize(pMol->m_nCrds);
 
   m_ramaplot.setup();
-  m_ramaplot.dump();
+  //m_ramaplot.dump();
 }
 
 realnum_t MiniTargCPU::calcEng()

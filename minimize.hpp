@@ -74,6 +74,7 @@ public:
 struct CudaData;
 struct CudaMapData;
 
+#ifdef HAVE_CUDA
 class MiniTargCUDA : public MiniTarg
 {
 public:
@@ -89,6 +90,7 @@ public:
   void calcMap();
   void calcBond();
 };
+#endif
 
 class Minimize
 {
@@ -110,11 +112,13 @@ public:
   virtual void minimize();
 };
 
+#ifdef HAVE_GSL
 class MinGSL : public Minimize
 {
 public:
   //virtual void setup(MolData *pMol, DensityMap *pMap);
   virtual void minimize();
 };
+#endif
 
 #endif

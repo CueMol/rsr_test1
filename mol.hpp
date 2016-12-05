@@ -470,6 +470,12 @@ struct MolData
       //ps.println("");
     }
   }
+#ifdef WIN32
+  double drand48()
+  {
+	  return ((double)(rand()) / RAND_MAX);
+  }
+#endif
 
   void addRand(float rng)
   {

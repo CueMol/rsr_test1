@@ -8,6 +8,10 @@
 #include <qlib/Utils.hpp>
 #include <qlib/Vector2D.hpp>
 
+#ifndef uint32_t
+typedef unsigned int uint32_t;
+#endif
+
 namespace {
   int rama_data_size = 36;
   uint32_t rama_gly[] = {

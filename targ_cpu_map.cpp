@@ -5,8 +5,6 @@
 #include <qlib/Utils.hpp>
 #include <qlib/LExceptions.hpp>
 
-#include <gsl/gsl_multimin.h>
-#include <gsl/gsl_blas.h>
 
 #include "minimize.hpp"
 #include "mol.hpp"

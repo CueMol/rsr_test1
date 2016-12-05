@@ -16,10 +16,16 @@ void Minimize::setup(MolData *pMol, DensityMap *pMap)
 {
   printf("Minimize generic setup\n");
   //m_nMaxIter = 10;
+
+#ifdef HAVE_CUDA
   if (m_bUseCUDA)
     m_pMiniTarg = new MiniTargCUDA();
   else
     m_pMiniTarg = new MiniTargCPU();
+#else
+  m_pMiniTarg = new MiniTargCPU();
+#endif
+  
   m_pMiniTarg->setup(pMol, pMap);
 
   //m_grad.resize(m_pMol->m_nCrds);

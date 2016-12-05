@@ -25,6 +25,8 @@ int main(int argc, char* argv[])
     return 0;
   }
 
+  qlib::init();
+  
   string parm = argv[1];
   string pdbin = argv[2];
   LString mapin = argv[3];
@@ -33,7 +35,7 @@ int main(int argc, char* argv[])
   DensityMap *pMap = new DensityMap;
   pMap->loadCNSMap(mapin);
   pMap->m_dScale = 1.0;
-  {
+  for (;;) {
     //RamaPlotData rpd;
     //rpd.setup();
     //rpd.dump();
@@ -43,8 +45,8 @@ int main(int argc, char* argv[])
     pMol->loadPDB(pdbin);
     //pMol->addRand(0.1);
     
-    //Minimize *pMin = new MinLBFGS;
-    Minimize *pMin = new MinGSL;
+    Minimize *pMin = new MinLBFGS;
+    //Minimize *pMin = new MinGSL;
 
     pMin->m_bUseCUDA = false;
     pMin->setup(pMol, pMap);
@@ -58,8 +60,8 @@ int main(int argc, char* argv[])
     //pMin->m_pMiniTarg->m_bRama = true;
     //pMin->m_pMiniTarg->m_bMap = true;
 
-    //pMin->minimize();
-    std::vector<float> grad = pMin->m_pMiniTarg->calc(dum);
+    pMin->minimize();
+    //std::vector<float> grad = pMin->m_pMiniTarg->calc(dum);
 
     // for (int i=0; i<grad.size(); ++i)
     // pMol->m_crds[i] += grad[i];
