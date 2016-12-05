@@ -10,6 +10,7 @@
 
 #include "minimize.hpp"
 #include "mol.hpp"
+#include "mat33_diag.hpp"
 
 //#define DEBUG_PRINT 1
 
@@ -91,6 +92,19 @@ void MiniTargCPU::calcPlanEng()
       printf("( %.5f %.5f %.5f )\n", resid_tens.aij(3,1), resid_tens.aij(3,2), resid_tens.aij(3,3));
       }*/
 
+    mat33_diag(resid_tens, evecs, evals);
+#ifdef DEBUG_PRINT
+    printf("eigenval1 = %e\n", evals.x());
+    printf("eigenval2 = %e\n", evals.y());
+    printf("eigenval3 = %e\n", evals.z());
+    {
+      printf("evecs:\n");
+      printf("( %.5f %.5f %.5f )\n", evecs.aij(1,1), evecs.aij(1,2), evecs.aij(1,3));
+      printf("( %.5f %.5f %.5f )\n", evecs.aij(2,1), evecs.aij(2,2), evecs.aij(2,3));
+      printf("( %.5f %.5f %.5f )\n", evecs.aij(3,1), evecs.aij(3,2), evecs.aij(3,3));
+    }
+#endif
+/*
     if (!resid_tens.diag(evecs, evals)) {
       printf("Diag failed for plane:\n");
       for (j=0; j<natoms; ++j) {
@@ -98,18 +112,18 @@ void MiniTargCPU::calcPlanEng()
 	printf("  %s\n", m_pMol->m_pfx[ia].c_str());
       }
       continue;
-    }
+    }*/
 #ifdef DEBUG_PRINT
     printf("eigenval1 = %e\n", evals.x());
     printf("eigenval2 = %e\n", evals.y());
     printf("eigenval3 = %e\n", evals.z());
-#endif
-    /*{
+    {
       printf("evecs:\n");
       printf("( %.5f %.5f %.5f )\n", evecs.aij(1,1), evecs.aij(1,2), evecs.aij(1,3));
       printf("( %.5f %.5f %.5f )\n", evecs.aij(2,1), evecs.aij(2,2), evecs.aij(2,3));
       printf("( %.5f %.5f %.5f )\n", evecs.aij(3,1), evecs.aij(3,2), evecs.aij(3,3));
-      }*/
+    }
+#endif
 
     int emin = find_emin(evals);;
     ev1.x() = evecs.aij(1,emin);
@@ -207,10 +221,11 @@ void MiniTargCPU::calcPlanFce()
     resid_tens.aij(3,1) = resid_tens.aij(1,3);
     resid_tens.aij(3,2) = resid_tens.aij(2,3);
 
-    if (!resid_tens.diag(evecs, evals)) {
+    mat33_diag(resid_tens, evecs, evals);
+    /*if (!resid_tens.diag(evecs, evals)) {
       printf("diag failed\n");
       continue;
-    }
+    }*/
 
     int emin = find_emin(evals);;
     ev1.x() = evecs.aij(1,emin);
