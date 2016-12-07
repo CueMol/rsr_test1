@@ -19,16 +19,117 @@ using qlib::LString;
 using qlib::Vector4D;
 using qlib::Matrix3D;
 
-static inline int find_emin(const Vector4D &evals)
-{
-  if (evals.x()<=evals.y() &&
-      evals.x()<=evals.z())
-    return 1;
-  else if (evals.y()<=evals.x() &&
-	   evals.y()<=evals.z())
-    return 2;
-  else
-    return 3;
+namespace {
+  inline int find_emin(const Vector4D &evals)
+  {
+    if (evals.x()<=evals.y() &&
+	evals.x()<=evals.z())
+      return 1;
+    else if (evals.y()<=evals.x() &&
+	     evals.y()<=evals.z())
+      return 2;
+    else
+      return 3;
+  }
+
+  inline void calc_covmat1(const std::vector<PlanElem> &atoms,
+			   const std::vector<float> &crds,
+			   Matrix3D &resid_tens,
+			   Vector4D &rc)
+  {
+    int j;
+    const int natoms = atoms.size();
+    realnum_t wsum = 0.0;
+    Vector4D r1;
+    for (j=0; j<natoms; ++j) {
+      const realnum_t w = atoms[j].wgt;
+      const int ia = atoms[j].iatom*3;
+      rc.x() += w*crds[ia + 0];
+      rc.y() += w*crds[ia + 1];
+      rc.z() += w*crds[ia + 2];
+      wsum += w;
+    }
+    rc = rc.scale(1.0/wsum);
+    //printf("Plane %d com (%f, %f, %f)\n", i, rc.x(), rc.y(), rc.z());
+    for (j=1; j<=3; ++j)
+      for (int k=1; k<=3; ++k)
+	resid_tens.aij(j,k) = 0.0;
+
+    for (j=0; j<natoms; ++j) {
+      const realnum_t w = atoms[j].wgt;
+      const int ia = atoms[j].iatom*3;
+      r1.x() = crds[ia + 0] - rc.x();
+      r1.y() = crds[ia + 1] - rc.y();
+      r1.z() = crds[ia + 2] - rc.z();
+
+      resid_tens.aij(1,1) += w * r1.x() * r1.x();
+      resid_tens.aij(2,2) += w * r1.y() * r1.y();
+      resid_tens.aij(3,3) += w * r1.z() * r1.z();
+      resid_tens.aij(1,2) += w * r1.x() * r1.y();
+      resid_tens.aij(1,3) += w * r1.x() * r1.z();
+      resid_tens.aij(2,3) += w * r1.y() * r1.z();
+    }
+    resid_tens.aij(2,1) = resid_tens.aij(1,2);
+    resid_tens.aij(3,1) = resid_tens.aij(1,3);
+    resid_tens.aij(3,2) = resid_tens.aij(2,3);
+  }
+
+  inline void calc_covmat2(const std::vector<PlanElem> &atoms,
+			   const std::vector<float> &crds,
+			   Matrix3D &resid_tens,
+			   Vector4D &rc)
+  {
+    int i,j;
+    const int natoms = atoms.size();
+    realnum_t wsum = 0.0;
+    Matrix3D smat(0, qlib::detail::no_init_tag());
+    for (i=1; i<=3; ++i)
+      for (j=1; j<=3; ++j)
+	smat.aij(i,j) = 0.0;
+
+    const int ka = atoms[0].iatom*3;
+    const float kx = crds[ka + 0];
+    const float ky = crds[ka + 1];
+    const float kz = crds[ka + 2];
+
+    for (j=0; j<natoms; ++j) {
+      const realnum_t w = 1.0; //atoms[j].wgt;
+      const int ia = atoms[j].iatom*3;
+      const float x = w*crds[ia + 0]-kx;
+      const float y = w*crds[ia + 1]-ky;
+      const float z = w*crds[ia + 2]-kz;
+      smat.aij(1,1) += x;
+      smat.aij(2,1) += y;
+      smat.aij(3,1) += z;
+
+      smat.aij(1,2) += x*x;
+      smat.aij(2,2) += y*y;
+      smat.aij(3,2) += z*z;
+
+      smat.aij(1,3) += x*y;
+      smat.aij(2,3) += y*z;
+      smat.aij(3,3) += z*x;
+      wsum += w;
+    }
+    smat = smat.scale(1.0/wsum);
+
+    rc.x() = smat.aij(1,1)+kx;
+    rc.y() = smat.aij(2,1)+ky;
+    rc.z() = smat.aij(3,1)+kz;
+
+    resid_tens.aij(1,1) = smat.aij(1,2) - smat.aij(1,1)*smat.aij(1,1);
+    resid_tens.aij(2,2) = smat.aij(2,2) - smat.aij(2,1)*smat.aij(2,1);
+    resid_tens.aij(3,3) = smat.aij(3,2) - smat.aij(3,1)*smat.aij(3,1);
+
+    resid_tens.aij(1,2) = smat.aij(1,3) - smat.aij(1,1)*smat.aij(2,1);
+    resid_tens.aij(1,3) = smat.aij(3,3) - smat.aij(1,1)*smat.aij(3,1);
+    resid_tens.aij(2,3) = smat.aij(2,3) - smat.aij(2,1)*smat.aij(3,1);
+
+    resid_tens.aij(2,1) = resid_tens.aij(1,2);
+    resid_tens.aij(3,1) = resid_tens.aij(1,3);
+    resid_tens.aij(3,2) = resid_tens.aij(2,3);
+  }
+
 }
 
 
@@ -52,38 +153,7 @@ void MiniTargCPU::calcPlanEng()
     const int natoms = plane.atoms.size();
 
     rc = Vector4D(0,0,0,0);
-    realnum_t wsum = 0.0;
-    for (j=0; j<natoms; ++j) {
-      const realnum_t w = plane.atoms[j].wgt;
-      const int ia = plane.atoms[j].iatom*3;
-      rc.x() += w*crds[ia + 0];
-      rc.y() += w*crds[ia + 1];
-      rc.z() += w*crds[ia + 2];
-      wsum += w;
-    }
-    rc = rc.scale(1.0/wsum);
-    //printf("Plane %d com (%f, %f, %f)\n", i, rc.x(), rc.y(), rc.z());
-    for (j=1; j<=3; ++j)
-      for (int k=1; k<=3; ++k)
-	resid_tens.aij(j,k) = 0.0;
-
-    for (j=0; j<natoms; ++j) {
-      const realnum_t w = plane.atoms[j].wgt;
-      const int ia = plane.atoms[j].iatom*3;
-      r1.x() = crds[ia + 0] - rc.x();
-      r1.y() = crds[ia + 1] - rc.y();
-      r1.z() = crds[ia + 2] - rc.z();
-
-      resid_tens.aij(1,1) += w * r1.x() * r1.x();
-      resid_tens.aij(2,2) += w * r1.y() * r1.y();
-      resid_tens.aij(3,3) += w * r1.z() * r1.z();
-      resid_tens.aij(1,2) += w * r1.x() * r1.y();
-      resid_tens.aij(1,3) += w * r1.x() * r1.z();
-      resid_tens.aij(2,3) += w * r1.y() * r1.z();
-    }
-    resid_tens.aij(2,1) = resid_tens.aij(1,2);
-    resid_tens.aij(3,1) = resid_tens.aij(1,3);
-    resid_tens.aij(3,2) = resid_tens.aij(2,3);
+    calc_covmat2(plane.atoms, crds, resid_tens, rc);
 
     /*{
       printf("resid_tens:\n");
@@ -94,9 +164,9 @@ void MiniTargCPU::calcPlanEng()
 
     mat33_diag(resid_tens, evecs, evals);
 #ifdef DEBUG_PRINT
-    printf("eigenval1 = %e\n", evals.x());
-    printf("eigenval2 = %e\n", evals.y());
-    printf("eigenval3 = %e\n", evals.z());
+    printf("eigenval1 = %f\n", evals.x());
+    printf("eigenval2 = %f\n", evals.y());
+    printf("eigenval3 = %f\n", evals.z());
     {
       printf("evecs:\n");
       printf("( %.5f %.5f %.5f )\n", evecs.aij(1,1), evecs.aij(1,2), evecs.aij(1,3));
@@ -188,44 +258,9 @@ void MiniTargCPU::calcPlanFce()
     const int natoms = plane.atoms.size();
 
     rc = Vector4D(0,0,0,0);
-    realnum_t wsum = 0.0;
-    for (j=0; j<natoms; ++j) {
-      const realnum_t w = plane.atoms[j].wgt;
-      const int ia = plane.atoms[j].iatom*3;
-      rc.x() += w*crds[ia + 0];
-      rc.y() += w*crds[ia + 1];
-      rc.z() += w*crds[ia + 2];
-      wsum += w;
-    }
-    rc = rc.scale(1.0/wsum);
-    // printf("Plane %d com (%f, %f, %f)\n", i, rc.x(), rc.y(), rc.z());
-    for (j=1; j<=3; ++j)
-      for (int k=1; k<=3; ++k)
-	resid_tens.aij(j,k) = 0.0;
-
-    for (j=0; j<natoms; ++j) {
-      const realnum_t w = plane.atoms[j].wgt;
-      const int ia = plane.atoms[j].iatom*3;
-      r1.x() = crds[ia + 0] - rc.x();
-      r1.y() = crds[ia + 1] - rc.y();
-      r1.z() = crds[ia + 2] - rc.z();
-
-      resid_tens.aij(1,1) += w * r1.x() * r1.x();
-      resid_tens.aij(2,2) += w * r1.y() * r1.y();
-      resid_tens.aij(3,3) += w * r1.z() * r1.z();
-      resid_tens.aij(1,2) += w * r1.x() * r1.y();
-      resid_tens.aij(1,3) += w * r1.x() * r1.z();
-      resid_tens.aij(2,3) += w * r1.y() * r1.z();
-    }
-    resid_tens.aij(2,1) = resid_tens.aij(1,2);
-    resid_tens.aij(3,1) = resid_tens.aij(1,3);
-    resid_tens.aij(3,2) = resid_tens.aij(2,3);
+    calc_covmat2(plane.atoms, crds, resid_tens, rc);
 
     mat33_diag(resid_tens, evecs, evals);
-    /*if (!resid_tens.diag(evecs, evals)) {
-      printf("diag failed\n");
-      continue;
-    }*/
 
     int emin = find_emin(evals);;
     ev1.x() = evecs.aij(1,emin);

@@ -12,7 +12,7 @@
 using namespace std;
 using qlib::LString;
 
-void Minimize::setup(MolData *pMol, DensityMap *pMap)
+void Minimize::setup()
 {
   printf("Minimize generic setup\n");
   //m_nMaxIter = 10;
@@ -26,7 +26,6 @@ void Minimize::setup(MolData *pMol, DensityMap *pMap)
   m_pMiniTarg = new MiniTargCPU();
 #endif
   
-  m_pMiniTarg->setup(pMol, pMap);
-
+  // m_pMiniTarg->setup(pMol, pMap);
   //m_grad.resize(m_pMol->m_nCrds);
 }

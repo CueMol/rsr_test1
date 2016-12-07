@@ -7,7 +7,6 @@
 
 #include "minimize.hpp"
 #include "mol.hpp"
-//#include "map.hpp"
 
 //#define DEBUG_PRINT 1
 
@@ -61,10 +60,19 @@ void MiniTargCPU::calcAnglEng()
     costh = qlib::min<realnum_t>(1.0f, qlib::max<realnum_t>(-1.0f, costh));
     realnum_t theta = (::acos(costh));
     realnum_t dtheta = (theta - angls[i].r0);
+    realnum_t eng = angls[i].kf*dtheta*dtheta;
 
-    m_Eangl += angls[i].kf*dtheta*dtheta;
+#ifdef DEBUG_PRINT
+    printf("  Eangl %d : %f\n", i, eng);
+#endif
+
+    m_Eangl += eng;
   }
   m_energy += m_Eangl;
+
+#ifdef DEBUG_PRINT
+  printf("CPU Eangl: %f\n", m_Eangl);
+#endif
 }
 
 void MiniTargCPU::calcAnglFce()
@@ -75,6 +83,10 @@ void MiniTargCPU::calcAnglFce()
   
   const std::vector<float> &crds = m_pMol->m_crds;
   const std::vector<Angl> angls = m_pMol->m_angls;
+
+  std::vector<realnum_t> g(ncrd);
+  for (i=0; i<ncrd; i++)
+    g[i] = 0.0f;
 
   for (i=0; i<nangl; ++i) {
     int ai = angls[i].atom_i*3;
@@ -133,21 +145,29 @@ void MiniTargCPU::calcAnglFce()
     realnum_t vec_dkjy = Dkj*(costh*ekjy - eijy);
     realnum_t vec_dkjz = Dkj*(costh*ekjz - eijz);
 
-    m_grad[ai+0] += vec_dijx;
-    m_grad[ai+1] += vec_dijy;
-    m_grad[ai+2] += vec_dijz;
+    g[ai+0] += vec_dijx;
+    g[ai+1] += vec_dijy;
+    g[ai+2] += vec_dijz;
 
-    m_grad[aj+0] -= vec_dijx;
-    m_grad[aj+1] -= vec_dijy;
-    m_grad[aj+2] -= vec_dijz;
+    g[aj+0] -= vec_dijx;
+    g[aj+1] -= vec_dijy;
+    g[aj+2] -= vec_dijz;
 
-    m_grad[ak+0] += vec_dkjx;
-    m_grad[ak+1] += vec_dkjy;
-    m_grad[ak+2] += vec_dkjz;
+    g[ak+0] += vec_dkjx;
+    g[ak+1] += vec_dkjy;
+    g[ak+2] += vec_dkjz;
 
-    m_grad[aj+0] -= vec_dkjx;
-    m_grad[aj+1] -= vec_dkjy;
-    m_grad[aj+2] -= vec_dkjz;
+    g[aj+0] -= vec_dkjx;
+    g[aj+1] -= vec_dkjy;
+    g[aj+2] -= vec_dkjz;
   }
+
+#ifdef DEBUG_PRINT
+  for (i=0; i<ncrd/3; i++)
+    printf("grad %d: %f %f %f\n", i, g[i*3+0], g[i*3+1], g[i*3+2]);
+#endif
+
+  for (i=0; i<ncrd; i++)
+    m_grad[i] += g[i];
 }
 

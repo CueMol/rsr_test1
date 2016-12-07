@@ -15,12 +15,8 @@
 using namespace std;
 using qlib::LString;
 
-void MiniTargCPU::setup(MolData *pMol, DensityMap *pMap)
+MiniTarg::MiniTarg()
 {
-  printf("TargCPU setup\n");
-  m_pMol = pMol;
-  m_pMap = pMap;
-
   m_bBond = false;
   m_bAngl = false;
   m_bDihe = false;
@@ -29,6 +25,21 @@ void MiniTargCPU::setup(MolData *pMol, DensityMap *pMap)
   m_bRama = false;
   m_bNonb = false;
   m_bMap = false;
+
+  m_pMol = NULL;
+  m_pMap = NULL;
+
+  m_energy = 0.0;
+  m_Edihe = m_Eangl = m_Ebond = m_Emap = 0.0;
+  m_Echir = m_Eplan = m_Erama = m_Enonb = 0.0;
+  
+}
+
+void MiniTargCPU::setup(MolData *pMol, DensityMap *pMap)
+{
+  printf("TargCPU setup\n");
+  m_pMol = pMol;
+  m_pMap = pMap;
 
   m_grad.resize(pMol->m_nCrds);
 

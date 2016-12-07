@@ -2,8 +2,9 @@
 #
 #
 
+NVCC=nvcc
 
-NVCCFLAGS=
+NVCCFLAGS=-gencode arch=compute_30,code=sm_30
 #NVCCFLAGS=--ftz=true --prec-div=false --prec-sqrt=false --fmad=true
 #NVCCFLAGS=--ftz=false --prec-div=true --prec-sqrt=true --fmad=false
 
@@ -12,7 +13,8 @@ CUDA_LDFLAGS= \
   -L/usr/local/cuda/lib64 \
   -lcuda -lcudart
 
-OBJS=main.o cudacode.o cuda_map.o minimize.o \
+OBJS=main.o \
+ minimize.o \
  min_gsl.o \
  min_lbgfs.o \
  liblbfgs/lbfgs.o \
@@ -25,7 +27,16 @@ OBJS=main.o cudacode.o cuda_map.o minimize.o \
  targ_cpu_plan.o \
  targ_cpu_rama.o \
  RamaPlotData.o \
- targ_cuda.o
+ \
+ targ_cuda.o \
+ com_cuda.o \
+ bond_cuda.o \
+ targ_cuda_bond.o \
+ angl_cuda.o \
+ targ_cuda_angl.o \
+$(NULL)
+
+# targ_cuda.o
 
 CFLAGS=-g \
   -DHAVE_CUDA \
@@ -48,6 +59,9 @@ LDFLAGS= \
 LDADD=-lqlib \
 -lgsl -lgslcblas
 
+%_cuda.o : %_cuda.cu
+	$(NVCC) $(NVCCFLAGS) -c $<
+
 all: program
 
 program: $(OBJS)
@@ -56,11 +70,12 @@ program: $(OBJS)
 #program: cudacode.o main.o
 #    g++ -o program -L/usr/local/cuda/lib64 -lcuda -lcudart main.o cudacode.o 
 
-cudacode.o: cudacode.cu cudacode.h cuda_bond_kern2.hpp cuda_bond_kern.hpp
-	nvcc $(NVCCFLAGS) -c cudacode.cu 
+cuda.o: cuda.cu cuda.hpp
 
-cuda_map.o: cuda_map.cu cudacode.h cuda_map_kern.hpp cuda_map_kern2.hpp
-	nvcc $(NVCCFLAGS) -c cuda_map.cu 
+#cuda_map.o: cuda_map.cu cudacode.h cuda_map_kern.hpp cuda_map_kern2.hpp
+#	nvcc $(NVCCFLAGS) -c cuda_map.cu 
+
+##
 
 clean:
 	rm -rf *.o program

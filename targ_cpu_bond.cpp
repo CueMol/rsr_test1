@@ -131,6 +131,9 @@ void MiniTargCPU::calcBondFce()
   u.f = g[0];
   printf("CPU Bond grad0: %.16e [%x]\n", u.f, u.ui);
   */
+  for (i=0; i<ncrd/3; i++)
+    printf("grad %d: %f %f %f\n", i, g[i*3+0], g[i*3+1], g[i*3+2]);
+
 #endif
 
   for (i=0; i<ncrd; i++)

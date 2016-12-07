@@ -370,6 +370,7 @@ void RamaPlotData::setup()
       if ( getValue(i, j) < 0.5 )
 	tmp.setValue(i, j, nw);
 
+  /*
   for (int i=0; i<nw; ++i) {
     for (int j=0; j<nw; ++j) {
       printf("%d ", int(tmp.getValuePeri(i-nw/2,j-nw/2))/nw );
@@ -377,6 +378,7 @@ void RamaPlotData::setup()
     printf("\n");
   }
   printf("\n");
+  */
 
   for (k=0; k<nw; k++) {
     for (i=0; i<nw; i++) {

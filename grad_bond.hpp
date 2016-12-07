@@ -3,59 +3,16 @@
 
 //#define DEBUG_PRINT 1
 
-void gradBond(MolData *pMol, std::vector<float> &grad)
-{
-  int i;
-  int nbond = pMol->m_nBonds;
-  int ncrd = pMol->m_nAtoms * 3;
-
-  //printf("target df nbond=%d, ncrd=%d\n", nbond, ncrd);
-  float eBond = 0.0f;
-
-  for (i=0; i<nbond; ++i) {
-    int atom_i = pMol->m_bonds[i].atom_i;
-    int atom_j = pMol->m_bonds[i].atom_j;
-
-    float dx = pMol->m_crds[atom_i*3+0] - pMol->m_crds[atom_j*3+0];
-    float dy = pMol->m_crds[atom_i*3+1] - pMol->m_crds[atom_j*3+1];
-    float dz = pMol->m_crds[atom_i*3+2] - pMol->m_crds[atom_j*3+2];
-
-    float sqlen = dx*dx + dy*dy + dz*dz;
-    float len = sqrt(sqlen);
-
-    float con = 2.0f * pMol->m_bonds[i].kf * (1.0f - pMol->m_bonds[i].r0/len);
-
-    grad[atom_i*3+0] += con * dx;
-    grad[atom_i*3+1] += con * dy;
-    grad[atom_i*3+2] += con * dz;
-
-    grad[atom_j*3+0] -= con * dx;
-    grad[atom_j*3+1] -= con * dy;
-    grad[atom_j*3+2] -= con * dz;
-
-    float ss = len - pMol->m_bonds[i].r0;
-    eBond += pMol->m_bonds[i].kf * ss * ss;
-  }
-
-#ifdef DEBUG_PRINT
-  int natom = pMol->m_nAtoms;
-  for (i=0; i<natom; ++i) {
-    printf("%d (%f,%f,%f)\n", i, grad[i*3+0], grad[i*3+1], grad[i*3+2]);
-  }
-  printf("CPU Ebond = %f\n", eBond);
-#endif
-}
-
 #include "cudacode.h"
 
-CudaData *prepBondCuda(MolData *pMol)
+CuBondData *prepBondCuda(MolData *pMol)
 {
   int i;
   int natom = pMol->m_nAtoms;
   int ncrd = natom * 3;
 
-  CudaData *pRet = new CudaData();
-  printf("prepCudaData nbond=%d, ncrd=%d\n", pMol->m_nBonds, ncrd);
+  CuBondData *pRet = new CuBondData();
+  printf("prepCuBondData nbond=%d, ncrd=%d\n", pMol->m_nBonds, ncrd);
 
   // setup exec layout
   if (natom<THR_PER_BLK) {
@@ -201,7 +158,7 @@ CudaData *prepBondCuda(MolData *pMol)
 }
 
 
-float gradBondCuda(MolData *pMol, CudaData *pDat, std::vector<float> &grad)
+float gradBondCuda(MolData *pMol, CuBondData *pDat, std::vector<float> &grad)
 {
   
   float val;
@@ -217,15 +174,15 @@ float gradBondCuda(MolData *pMol, CudaData *pDat, std::vector<float> &grad)
   return val;
 }
 
-CudaData2 *prepBondCuda2(MolData *pMol)
+CuBondData2 *prepBondCuda2(MolData *pMol)
 {
   int i;
   int natom = pMol->m_nAtoms;
   int ncrd = natom * 3;
 
-  CudaData2 *pRet = new CudaData2();
+  CuBondData2 *pRet = new CuBondData2();
 
-  printf("prepCudaData2 nbond=%d, natom=%d\n", pMol->m_nBonds, pMol->m_nAtoms);
+  printf("prepCuBondData2 nbond=%d, natom=%d\n", pMol->m_nBonds, pMol->m_nAtoms);
 
   const int nbond = pMol->m_nBonds;
   std::vector<int> accum(natom);
@@ -327,7 +284,7 @@ CudaData2 *prepBondCuda2(MolData *pMol)
 }
 
 
-void gradBondCuda2(MolData *pMol, CudaData2 *pDat, std::vector<float> &grad)
+void gradBondCuda2(MolData *pMol, CuBondData2 *pDat, std::vector<float> &grad)
 {
   
   float val;

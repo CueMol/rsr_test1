@@ -11,6 +11,8 @@ typedef double realnum_t;
 class MiniTarg
 {
 public:
+  MiniTarg();
+
   bool m_bBond;
   bool m_bAngl;
   bool m_bDihe;
@@ -71,24 +73,39 @@ public:
   void calcRamaFce();
 };
 
-struct CudaData;
-struct CudaMapData;
-
 #ifdef HAVE_CUDA
-class MiniTargCUDA : public MiniTarg
+class CuComData;
+class CuBondData;
+class CuAnglData;
+//struct CuMapData;
+
+class MiniTargCUDA : public MiniTargCPU
 {
 public:
-  CudaData *m_pBondData;
-  CudaMapData *m_pMapData;
+  typedef MiniTargCPU super_t;
+
+  CuComData *m_pComData;
+  CuBondData *m_pBondData;
+  CuAnglData *m_pAnglData;
+  //CuMapData *m_pMapData;
 
   std::vector<float> m_gradtmp;
 
-  void setup(MolData *pMol, DensityMap *pMap);
+  MiniTargCUDA() : super_t(), m_pComData(NULL), m_pBondData(NULL), m_pAnglData(NULL)
+  {
+  }
 
-  const std::vector<float> &calc(float &eng);
+  virtual ~MiniTargCUDA();
 
-  void calcMap();
+  virtual void setup(MolData *pMol, DensityMap *pMap);
+
+  virtual const std::vector<float> &calc(float &eng);
+
+  void cleanup();
+
+  // void calcMap();
   void calcBond();
+  void calcAngl();
 };
 #endif
 
@@ -101,7 +118,7 @@ public:
 
   bool m_bUseCUDA;
 
-  virtual void setup(MolData *pMol, DensityMap *pMap);
+  virtual void setup();
   virtual void minimize() =0;
 };
 
