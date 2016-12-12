@@ -74,6 +74,7 @@ static int progress(void *instance,
     printf("  Edihe = %f\n", pMin->m_Edihe);
     printf("  Echir = %f", pMin->m_Echir);
     printf("  Eplan = %f", pMin->m_Eplan);
+    printf("  Enonb = %f", pMin->m_Enonb);
     printf("  Emap  = %f", pMin->m_Emap);
     printf("\n");
   }
@@ -253,6 +254,7 @@ void MinLBFGS::minimize()
   printf("  Edihe = %f\n", m_pMiniTarg->m_Edihe);
   printf("  Echir = %f", m_pMiniTarg->m_Echir);
   printf("  Eplan = %f", m_pMiniTarg->m_Eplan);
+  printf("  Enonb = %f", m_pMiniTarg->m_Enonb);
   printf("  Emap  = %f", m_pMiniTarg->m_Emap);
   printf("\n");
 

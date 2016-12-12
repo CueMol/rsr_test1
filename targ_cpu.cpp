@@ -41,6 +41,11 @@ void MiniTargCPU::setup(MolData *pMol, DensityMap *pMap)
   m_pMol = pMol;
   m_pMap = pMap;
 
+  if (m_bMap && pMap==NULL) {
+    printf("Map is not specified (null)\n");
+    abort();
+  }
+
   m_grad.resize(pMol->m_nCrds);
 
   m_ramaplot.setup();
@@ -81,6 +86,9 @@ realnum_t MiniTargCPU::calcEng()
   if (m_bMap)
     calcMapEng();
 
+  if (m_bNonb)
+    calcNonbEng();
+
   /*
   realnum_t resid = fabs(m_Edihe-edh2)/m_Edihe * 100;
   if (resid>0.00001)
@@ -118,6 +126,9 @@ const std::vector<float> &MiniTargCPU::calcFce()
 
   if (m_bMap)
     calcMapFce();
+
+  if (m_bNonb)
+    calcNonbFce();
 
   return m_grad;
 }

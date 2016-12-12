@@ -21,7 +21,7 @@ using qlib::LString;
 #if 1
 int main(int argc, char* argv[])
 {
-  if (argc!=4) {
+  if (!(argc==3||argc==4)) {
     printf("usage: %s <parm> <pdb> <map>\n", argv[0]);
     return 0;
   }
@@ -30,37 +30,60 @@ int main(int argc, char* argv[])
   
   string parm = argv[1];
   string pdbin = argv[2];
-  LString mapin = argv[3];
+  LString mapin;
+  DensityMap *pMap = NULL;
+
+  if (argc==4) {
+    mapin = argv[3];
+    pMap = new DensityMap;
+    pMap->loadCNSMap(mapin);
+    pMap->m_dScale = 1.0;
+  }
 
   float dum;
-
-  //  DensityMap *pMap = new DensityMap;
-  //pMap->loadCNSMap(mapin);
-  //pMap->m_dScale = 1.0;
+  
 
   MolData *pMol = new MolData;
   pMol->loadparm(parm);
   pMol->loadPDB(pdbin);
+  pMol->buildNonbData();
+
+  //pMol->addRand(0.5);
     
   Minimize *pMin = new MinLBFGS;
   //Minimize *pMin = new MinGSL;
 
-  pMin->m_bUseCUDA = true;
-  //pMin->m_bUseCUDA = false;
+  //pMin->m_bUseCUDA = true;
+  pMin->m_bUseCUDA = false;
   pMin->setup();
-
+  
   pMin->m_pMiniTarg->m_bBond = true;
   pMin->m_pMiniTarg->m_bAngl = true;
-  pMin->m_pMiniTarg->setup(pMol, NULL);
+  pMin->m_pMiniTarg->m_bChir = true;
+  pMin->m_pMiniTarg->m_bPlan = true;
+  pMin->m_pMiniTarg->m_bNonb = true;
+  pMin->m_pMiniTarg->m_bMap = true;
+  pMin->m_pMiniTarg->setup(pMol, pMap);
 
   pMin->m_nMaxIter = 10000;
 
-  //pMin->minimize();
+  pMin->minimize();
+  //pMol->savePDB("outout.pdb");
 
-  //{
-    for (int i=0; i<1000*10; ++i) {
-    const std::vector<float> &grad = pMin->m_pMiniTarg->calc(dum);
-    //printf("Etotal=%f\n", dum);
+  {
+    const std::vector<float> *pgrad;
+    
+    //for (int i=0; i<1000; ++i) {
+    {
+      const std::vector<float> &grad = pMin->m_pMiniTarg->calc(dum);
+      pgrad = &grad;
+    }
+
+    for (int i=0; i<qlib::min<int>(pgrad->size()/3,10); ++i) {
+      printf("grad %d: %f %f %f\n", i, (*pgrad)[i*3+0], (*pgrad)[i*3+1], (*pgrad)[i*3+2]);
+    }
+    printf("Etotal=%f\n", dum);
+
   }
 
 }

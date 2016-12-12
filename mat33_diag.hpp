@@ -6,11 +6,25 @@ namespace {
   using qlib::Matrix3D;
 
   template <typename T>
-  double sqr(T val) { return val*val; }
+  T sqr(T val) { return val*val; }
+  
+  inline
+  void mkevec(const Matrix3D &mat, const Vector4D &ev, Matrix3D &evecs, int i, int j, int k)
+  {
+    Vector4D v1;
+    v1.x() = (mat.aij(1,1)-ev.ai(j))*(mat.aij(1,1)-ev.ai(k)) + mat.aij(1,2)*mat.aij(2,1) + mat.aij(1,3)*mat.aij(3,1);
+    v1.y() = (mat.aij(1,1)-ev.ai(j))*mat.aij(1,2) + mat.aij(1,2)*(mat.aij(2,2)-ev.ai(k)) + mat.aij(1,3)*mat.aij(3,2);
+    v1.z() = (mat.aij(1,1)-ev.ai(j))*mat.aij(1,3) + mat.aij(1,2)*mat.aij(2,3) + mat.aij(1,3)*(mat.aij(3,3)-ev.ai(k));
+    
+    double len1 = sqrt( sqr(v1.x()) + sqr(v1.y()) + sqr(v1.z()));
+    evecs.aij(1,i) = v1.x() / len1;
+    evecs.aij(2,i) = v1.y() / len1;
+    evecs.aij(3,i) = v1.z() / len1;
+  }
 
   inline
-    void mat33_diag(const Matrix3D &mat, Matrix3D &evecs, Vector4D &evals)
-    {
+  void mat33_diag(const Matrix3D &mat, Matrix3D &evecs, Vector4D &evals)
+  {
       double p1 = sqr( mat.aij(1,2) ) + sqr( mat.aij(1,3) ) + sqr( mat.aij(2,3) );
 
 
@@ -50,14 +64,15 @@ namespace {
         //printf("evals.y: %f\n", evals.y());
         //printf("evals.z: %f\n", evals.z());
 
+	/*
         Matrix3D ev1 = (mat-I.scale(evals.y())).mul(mat-I.scale(evals.z()));
         Matrix3D ev2 = (mat-I.scale(evals.z())).mul(mat-I.scale(evals.x()));
         Matrix3D ev3 = (mat-I.scale(evals.x())).mul(mat-I.scale(evals.y()));
-
+	
         double len1 = sqrt( sqr(ev1.aij(1,1)) + sqr(ev1.aij(1,2)) + sqr(ev1.aij(1,3)));
-        evecs.aij(1,1) = ev1.aij(1,1) / len1;
-        evecs.aij(2,1) = ev1.aij(1,2) / len1;
-        evecs.aij(3,1) = ev1.aij(1,3) / len1;
+        evecs.aij(1,2) = ev1.aij(1,1) / len1;
+        evecs.aij(2,2) = ev1.aij(1,2) / len1;
+        evecs.aij(3,2) = ev1.aij(1,3) / len1;
 
         double len2 = sqrt( sqr(ev2.aij(1,1)) + sqr(ev2.aij(1,2)) + sqr(ev2.aij(1,3)));
         evecs.aij(1,2) = ev2.aij(1,1) / len2;
@@ -68,6 +83,20 @@ namespace {
         evecs.aij(1,3) = ev3.aij(1,1) / len3;
         evecs.aij(2,3) = ev3.aij(1,2) / len3;
         evecs.aij(3,3) = ev3.aij(1,3) / len3;
+	*/
+
+	//mkevec(mat, evals, evecs, 1, 2, 3);
+	//mkevec(mat, evals, evecs, 2, 3, 1);
+	//mkevec(mat, evals, evecs, 3, 1, 2);
+
+	if (evals.x()<=evals.y() &&
+	    evals.x()<=evals.z())
+	  mkevec(mat, evals, evecs, 1, 2, 3);
+	else if (evals.y()<=evals.x() &&
+		 evals.y()<=evals.z())
+	  mkevec(mat, evals, evecs, 1, 3, 1);
+	else
+	  mkevec(mat, evals, evecs, 1, 1, 2);
       }
     }
 }

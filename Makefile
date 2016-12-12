@@ -14,6 +14,7 @@ CUDA_LDFLAGS= \
   -lcuda -lcudart
 
 OBJS=main.o \
+ mol.o \
  minimize.o \
  min_gsl.o \
  min_lbgfs.o \
@@ -26,6 +27,7 @@ OBJS=main.o \
  targ_cpu_chir.o \
  targ_cpu_plan.o \
  targ_cpu_rama.o \
+ targ_cpu_nonb.o \
  RamaPlotData.o \
  \
  targ_cuda.o \
@@ -34,6 +36,11 @@ OBJS=main.o \
  targ_cuda_bond.o \
  angl_cuda.o \
  targ_cuda_angl.o \
+ map1_cuda.o \
+ targ_cuda_map.o \
+ map2_cuda.o \
+ plan_cuda.o \
+ targ_cuda_plan.o \
 $(NULL)
 
 # targ_cuda.o
@@ -80,7 +87,7 @@ cuda.o: cuda.cu cuda.hpp
 clean:
 	rm -rf *.o program
 
-main.o: main.cpp map.hpp mol.hpp grad_bond.hpp cudacode.h grad_map.hpp
+main.o: main.cpp map.hpp mol.hpp grad_bond.hpp grad_map.hpp
 
 minimize.o: minimize.cpp map.hpp mol.hpp
 
@@ -96,7 +103,7 @@ targ_cpu_dihe.o: targ_cpu_dihe.cpp mol.hpp minimize.hpp
 
 targ_cpu_chir.o: targ_cpu_chir.cpp mol.hpp minimize.hpp
 
-targ_cpu_plan.o: targ_cpu_plan.cpp mol.hpp minimize.hpp
+targ_cpu_plan.o: targ_cpu_plan.cpp mol.hpp minimize.hpp mat33_diag.hpp
 
 targ_cpu_rama.o: targ_cpu_rama.cpp mol.hpp minimize.hpp
 

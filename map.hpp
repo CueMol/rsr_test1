@@ -2,6 +2,9 @@
 #ifndef MAP_HPP_INCLUDED
 #define MAP_HPP_INCLUDED
 
+#include <qlib/LineStream.hpp>
+#include <qlib/PrintStream.hpp>
+#include <qlib/FileStream.hpp>
 #include <qlib/Matrix3D.hpp>
 
 using qlib::Matrix3D;

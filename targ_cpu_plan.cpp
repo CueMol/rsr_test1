@@ -195,7 +195,7 @@ void MiniTargCPU::calcPlanEng()
     }
 #endif
 
-    int emin = find_emin(evals);;
+    int emin = 1; //find_emin(evals);
     ev1.x() = evecs.aij(1,emin);
     ev1.y() = evecs.aij(2,emin);
     ev1.z() = evecs.aij(3,emin);
@@ -262,7 +262,7 @@ void MiniTargCPU::calcPlanFce()
 
     mat33_diag(resid_tens, evecs, evals);
 
-    int emin = find_emin(evals);;
+    int emin = 1; //find_emin(evals);;
     ev1.x() = evecs.aij(1,emin);
     ev1.y() = evecs.aij(2,emin);
     ev1.z() = evecs.aij(3,emin);

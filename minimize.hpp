@@ -71,13 +71,17 @@ public:
 
   void calcRamaEng();
   void calcRamaFce();
+
+  void calcNonbEng();
+  void calcNonbFce();
 };
 
 #ifdef HAVE_CUDA
 class CuComData;
 class CuBondData;
 class CuAnglData;
-//struct CuMapData;
+class CuMapData;
+class CuPlanData;
 
 class MiniTargCUDA : public MiniTargCPU
 {
@@ -87,7 +91,8 @@ public:
   CuComData *m_pComData;
   CuBondData *m_pBondData;
   CuAnglData *m_pAnglData;
-  //CuMapData *m_pMapData;
+  CuMapData *m_pMapData;
+  CuPlanData *m_pPlanData;
 
   std::vector<float> m_gradtmp;
 
@@ -103,9 +108,10 @@ public:
 
   void cleanup();
 
-  // void calcMap();
   void calcBond();
   void calcAngl();
+  void calcMap();
+  void calcPlan();
 };
 #endif
 
