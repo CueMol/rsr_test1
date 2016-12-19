@@ -53,7 +53,7 @@ void CuComData::resetGrad()
 {
   // ??? [0b,0b,0b,0b] == 0.0f in IEEE float??
   cudaMemset( pd_grad, 0, (m_nAtom*3+GRAD_PAD)*sizeof(float) );
-  cudaMemset( pd_eatm, 0, (EATM_MAX)*sizeof(float) );
+  //cudaMemset( pd_eatm, 0, (EATM_MAX)*sizeof(float) );
 }
 
 void CuComData::xferGrad(std::vector<float> &grad) const

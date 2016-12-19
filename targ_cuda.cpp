@@ -17,6 +17,7 @@
 #include "angl_cuda.hpp"
 #include "map_cuda.hpp"
 #include "plan_cuda.hpp"
+#include "nonb_cuda.hpp"
 
 #define DEBUG_PRINT 1
 
@@ -45,8 +46,8 @@ void MiniTargCUDA::setup(MolData *pMol, DensityMap *pMap)
   printf("  bBond = %d\n", m_bBond);
   if (m_bBond) {
     m_pBondData = new CuBondData();
-    m_pBondData->setup(pMol);
-    m_pBondData->setupCuda(m_pComData);
+    m_pBondData->setup2(pMol);
+    m_pBondData->setupCuda2(m_pComData);
   }
 
   // setup CUDA angle calc data structure
@@ -60,15 +61,25 @@ void MiniTargCUDA::setup(MolData *pMol, DensityMap *pMap)
   // setup CUDA plane calc data structure
   printf("  bPlan = %d\n", m_bPlan);
   if (m_bPlan) {
-    m_pPlanData = new CuPlanData();
+    //m_pPlanData = new CuPlanData();
+    m_pPlanData = new PLANE_DATA();
     m_pPlanData->setup(pMol);
     m_pPlanData->setupCuda(m_pComData);
+  }
+
+  // setup CUDA nonb calc data structure
+  printf("  bNonb = %d\n", m_bNonb);
+  if (m_bNonb) {
+    m_pNonbData = new NONB_DATA();
+    m_pNonbData->setup(pMol);
+    m_pNonbData->setupCuda(m_pComData);
   }
 
   // setup CUDA mape calc data structure
   printf("  bMap = %d\n", m_bMap);
   if (m_bMap) {
-    m_pMapData = new CuMap2Data();
+    //m_pMapData = new CuMap2Data();
+    m_pMapData = new CuMapData();
     m_pMapData->setup(pMol, pMap);
     m_pMapData->setupCuda(m_pComData);
   }
@@ -96,14 +107,16 @@ const std::vector<float> &MiniTargCUDA::calc(float &eng)
 {
   const int ncrd = m_grad.size();
   m_energy = 0.0f;
+  for (int i=0; i<ncrd; ++i) {
+    m_grad[i] = 0.0f;
+  }
 
   m_pComData->xferCrds(m_pMol->m_crds);
   m_pComData->resetGrad();
 
   if (m_bBond) {
-    calcBond();
-    //calcBondEng();
-    //calcBondFce();
+    m_pBondData->calc2();
+
 #ifdef DEBUG_PRINT
   printf("After bond\n");
   m_pComData->xferGrad(m_gradtmp);
@@ -141,14 +154,24 @@ const std::vector<float> &MiniTargCUDA::calc(float &eng)
 
   if (m_bPlan) {
     calcPlan();
-    //calcPlanEng();
-    //calcPlanFce();
   }
+
+  if (m_bNonb) {
+    m_pNonbData->calc();
+  }
+
+  ////////////////////
+  // use CPU version
+
+  if (m_bChir) {
+    calcChirEng();
+    calcChirFce();
+  }  
 
   m_pComData->xferGrad(m_gradtmp);
 
   for (int i=0; i<ncrd; ++i) {
-    m_grad[i] = m_gradtmp[i];
+    m_grad[i] += m_gradtmp[i];
   }
 
 #ifdef DEBUG_PRINT
@@ -158,11 +181,9 @@ const std::vector<float> &MiniTargCUDA::calc(float &eng)
   }
 #endif
 
-  m_energy = 0.0f;
   for (int i=ncrd; i<ncrd+32; ++i) {
     m_energy += m_gradtmp[i];
   }
-
 
   eng = m_energy;
   return m_grad;

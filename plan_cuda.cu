@@ -138,11 +138,7 @@ void CuPlanData::setupCuda(CuComData *pComDat)
 
   const int nplan = m_cuplans.size();
 
-  calcThrBlk(nplan, &m_nthr, &m_nblk, &m_nDevPlan);
-  printf("Plan nThr = %d (%d x %d)\n", m_nDevPlan, m_nblk, m_nthr);
-
   //////////
-  // memory for 1st stage
 
   // parameter array (param)
   cudaMalloc((void**)&pd_plan, m_nDevPlan*sizeof(CuPlan));

@@ -47,4 +47,22 @@ public:
   CuComData *m_pComDat;
 };
 
+#define PLAN2_NTHR 16
+
+class CuPlan2Data : public CuPlanData
+{
+public:
+
+  //CuPlan2Data();
+  //virtual ~CuPlan2Data();
+
+  void setup(MolData *pMol);
+
+  void setupCuda(CuComData *pComDat);
+
+  //void cleanupCuda();
+  
+  void calc();
+};
+
 #endif

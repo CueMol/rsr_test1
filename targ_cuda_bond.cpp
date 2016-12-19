@@ -20,6 +20,20 @@
 using namespace std;
 using qlib::LString;
 
+CuBondData::CuBondData()
+{
+  pd_bond = NULL;
+  pd_bondres = NULL;
+  pd_bind = NULL;
+  pd_bvec = NULL;
+  pd_eatm = NULL;
+}
+
+CuBondData::~CuBondData()
+{
+  cleanupCuda();
+}
+
 void CuBondData::setup(MolData *pMol)
 {
   int i;

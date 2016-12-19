@@ -476,6 +476,10 @@ void MolData::buildNonbData()
       //if (is1_4(i, j))
       //continue;
 
+      //szes[i].push_back(j);
+      //szes[j].push_back(i);
+      //continue;
+
       //bool bcond = true;
       //bool bcond = drand48()<0.5;
       bool bcond = ((i+j)%2==0);
@@ -530,12 +534,12 @@ void MolData::buildNonbData()
       else if (isPolar(i) || isPolar(j)) {
 	r0 = 2.3;
       }
-      m_nonbs[i].atoms[j].r0 = r0;
+      m_nonbs[i].atoms[j].r0 = 3.5; //r0;
+      // ??? XXX
+      //m_nonbs[i].atoms[j].wgt = 1.0/(0.02*0.02);
+      m_nonbs[i].atoms[j].wgt = 1.0;
     }
   }
-
-  // ??? XXX
-  m_nonb_wgt = 1.0/(0.02*0.02);
 
   m_bondmap.clear();
   m_anglmap.clear();

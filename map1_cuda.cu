@@ -122,9 +122,9 @@ __global__ void MapGradKern1(const float* crds, const float* wgts, int natoms,
   d1.y *= w;
   d1.z *= w;
 
-  grad[icrd+0] = d1.x;
-  grad[icrd+1] = d1.y;
-  grad[icrd+2] = d1.z;
+  grad[icrd+0] += d1.x;
+  grad[icrd+1] += d1.y;
+  grad[icrd+2] += d1.z;
 
   const int tid = threadIdx.x;
 

@@ -16,20 +16,6 @@
 
 //#define DEBUG_PRINT 1
 
-CuBondData::CuBondData()
-{
-  pd_bond = NULL;
-  pd_bondres = NULL;
-  pd_bind = NULL;
-  pd_bvec = NULL;
-  pd_eatm = NULL;
-}
-
-CuBondData::~CuBondData()
-{
-  cleanupCuda();
-}
-
 void CuBondData::setupCuda(CuComData *pComDat)
 {
   m_pComDat = pComDat;

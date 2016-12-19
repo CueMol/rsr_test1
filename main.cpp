@@ -41,7 +41,6 @@ int main(int argc, char* argv[])
   }
 
   float dum;
-  
 
   MolData *pMol = new MolData;
   pMol->loadparm(parm);
@@ -53,21 +52,21 @@ int main(int argc, char* argv[])
   Minimize *pMin = new MinLBFGS;
   //Minimize *pMin = new MinGSL;
 
-  //pMin->m_bUseCUDA = true;
-  pMin->m_bUseCUDA = false;
+  pMin->m_bUseCUDA = true;
+  //pMin->m_bUseCUDA = false;
   pMin->setup();
   
-  pMin->m_pMiniTarg->m_bBond = true;
-  pMin->m_pMiniTarg->m_bAngl = true;
-  pMin->m_pMiniTarg->m_bChir = true;
-  pMin->m_pMiniTarg->m_bPlan = true;
+  //pMin->m_pMiniTarg->m_bBond = true;
+  //pMin->m_pMiniTarg->m_bAngl = true;
+  //pMin->m_pMiniTarg->m_bChir = true;
+  //pMin->m_pMiniTarg->m_bPlan = true;
   pMin->m_pMiniTarg->m_bNonb = true;
-  pMin->m_pMiniTarg->m_bMap = true;
+  //pMin->m_pMiniTarg->m_bMap = true;
   pMin->m_pMiniTarg->setup(pMol, pMap);
 
   pMin->m_nMaxIter = 10000;
 
-  pMin->minimize();
+  //pMin->minimize();
   //pMol->savePDB("outout.pdb");
 
   {
@@ -79,12 +78,12 @@ int main(int argc, char* argv[])
       pgrad = &grad;
     }
 
-    for (int i=0; i<qlib::min<int>(pgrad->size()/3,10); ++i) {
+    for (int i=0; i<qlib::min<int>(pgrad->size()/3,20); ++i) {
       printf("grad %d: %f %f %f\n", i, (*pgrad)[i*3+0], (*pgrad)[i*3+1], (*pgrad)[i*3+2]);
     }
     printf("Etotal=%f\n", dum);
 
-  }
+    }
 
 }
 #endif

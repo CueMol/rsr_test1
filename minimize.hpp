@@ -82,6 +82,11 @@ class CuBondData;
 class CuAnglData;
 class CuMapData;
 class CuPlanData;
+class CuPlan2Data;
+class CuNonbData;
+
+#define PLANE_DATA CuPlan2Data
+#define NONB_DATA CuNonbData
 
 class MiniTargCUDA : public MiniTargCPU
 {
@@ -92,7 +97,9 @@ public:
   CuBondData *m_pBondData;
   CuAnglData *m_pAnglData;
   CuMapData *m_pMapData;
-  CuPlanData *m_pPlanData;
+
+  PLANE_DATA *m_pPlanData;
+  NONB_DATA *m_pNonbData;
 
   std::vector<float> m_gradtmp;
 

@@ -73,6 +73,7 @@ struct NonbElem
 {
   int aj;
   float r0;
+  float wgt;
 };
 
 struct Nonb
@@ -102,7 +103,6 @@ struct MolData
   std::vector<Plan> m_plans;
   std::vector<Rama> m_ramas;
 
-  float m_nonb_wgt;
   int m_nNonbPairMax;
   std::vector<Nonb> m_nonbs;
 

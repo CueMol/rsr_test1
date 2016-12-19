@@ -33,7 +33,6 @@ public:
   void cleanupCuda();
   
   void calc(float *val, std::vector<float> &grad);
-  void calc2(float *val, std::vector<float> &grad);
 
   std::vector<CuBond> m_cubonds;
   std::vector<int> m_bind;
@@ -53,39 +52,15 @@ public:
 
   // common data
   CuComData *m_pComDat;
+
+  //////////
+
+  void calc2();
+
+  void setup2(MolData *pMol);
+
+  void setupCuda2(CuComData *pComDat);
 };
 
-#if 0
-struct CuBondData2
-{
-
-  CuBondData2() : pd_crds(NULL), pd_bond(NULL), pd_bvec(NULL), pd_grad(NULL), pd_eatm(NULL)
-  {
-  }
-
-  int nthr, nblk;
-
-  std::vector<int> bvec;
-  std::vector<CuBond> cubonds;
-
-  // device memory
-  float *pd_crds;
-  CuBond *pd_bond;
-  int *pd_bvec;
-  float *pd_grad;
-  float *pd_eatm;
-
-};
-
-  
-void cudaBond_fdf(const std::vector<float> &crds,
-		  CuBondData *pDat,
-		  float *val, std::vector<float> &grad);
-
-void cudaBond_fdf2(const std::vector<float> &crds,
-		   CuBondData2 *pDat,
-		   float *val, std::vector<float> &grad);
-
-#endif
 
 #endif

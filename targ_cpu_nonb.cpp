@@ -24,15 +24,15 @@ void MiniTargCPU::calcNonbEng()
   m_Enonb = 0.0f;
 
   const std::vector<float> &crds = m_pMol->m_crds;
-  const std::vector<Nonb> nonbs = m_pMol->m_nonbs;
+  const std::vector<Nonb>& nonbs = m_pMol->m_nonbs;
 
-  const float kf = m_pMol->m_nonb_wgt;
   for (i=0; i<natom; ++i) {
     const int ai = i*3;
     const int na2 = nonbs[i].atoms.size();
     for (j=0; j<na2; ++j) {
       const int aj = nonbs[i].atoms[j].aj*3;
       const float r0 = nonbs[i].atoms[j].r0;
+      const float kf = nonbs[i].atoms[j].wgt;
 
       const realnum_t dx = realnum_t(crds[ai+0]) - realnum_t(crds[aj+0]);
       const realnum_t dy = realnum_t(crds[ai+1]) - realnum_t(crds[aj+1]);
@@ -76,9 +76,7 @@ void MiniTargCPU::calcNonbFce()
     g[i] = 0.0f;
 
   const std::vector<float> &crds = m_pMol->m_crds;
-  const std::vector<Nonb> nonbs = m_pMol->m_nonbs;
-
-  const float kf = m_pMol->m_nonb_wgt;
+  const std::vector<Nonb>& nonbs = m_pMol->m_nonbs;
 
   for (i=0; i<natom; ++i) {
     const int ai = i*3;
@@ -86,6 +84,7 @@ void MiniTargCPU::calcNonbFce()
     for (j=0; j<na2; ++j) {
       const int aj = nonbs[i].atoms[j].aj*3;
       const float r0 = nonbs[i].atoms[j].r0;
+      const float kf = nonbs[i].atoms[j].wgt;
 
       const realnum_t dx = realnum_t(crds[ai+0]) - realnum_t(crds[aj+0]);
       const realnum_t dy = realnum_t(crds[ai+1]) - realnum_t(crds[aj+1]);
