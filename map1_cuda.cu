@@ -211,3 +211,14 @@ void CuMapData::calc()
   }
 #endif
 }
+
+/*
+void CuMapData::setup(MolData *pMol, DensityMap *pMap)
+{
+}
+
+void CuMap2Data::setup(MolData *pMol, DensityMap *pMap)
+{
+}
+*/
+

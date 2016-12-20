@@ -10,7 +10,7 @@
 #include "com_cuda.hpp"
 #include "nonb_cuda.hpp"
 
-#define DEBUG_PRINT 1
+//#define DEBUG_PRINT 1
 
 using namespace std;
 using qlib::LString;

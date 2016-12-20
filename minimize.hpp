@@ -81,10 +81,12 @@ class CuComData;
 class CuBondData;
 class CuAnglData;
 class CuMapData;
+class CuMap2Data;
 class CuPlanData;
 class CuPlan2Data;
 class CuNonbData;
 
+#define MAP_DATA CuMapData
 #define PLANE_DATA CuPlan2Data
 #define NONB_DATA CuNonbData
 
@@ -96,7 +98,7 @@ public:
   CuComData *m_pComData;
   CuBondData *m_pBondData;
   CuAnglData *m_pAnglData;
-  CuMapData *m_pMapData;
+  MAP_DATA *m_pMapData;
 
   PLANE_DATA *m_pPlanData;
   NONB_DATA *m_pNonbData;

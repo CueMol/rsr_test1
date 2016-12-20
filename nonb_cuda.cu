@@ -80,7 +80,7 @@ void NonbGradKern1(const float* crds, const int* indmat, const int* prmmat,
     float4 d;
     float r0, wgt;
 
-    //printf("thr %d iatom %d i= %d - %d\n", ithr, iatom, ibase, imax-1);
+    printf("thr %d iatom %d \n", ithr, iatom);
 
     const int idx_base = iatom*nonb_max;
 
@@ -141,7 +141,7 @@ void NonbGradKern1(const float* crds, const int* indmat, const int* prmmat,
     }
 
     if (laneid==0) {
-      //printf("atom %d %f,%f,%f\n", ai/3, g.x, g.y, g.z);
+      printf("atom %d %f,%f,%f\n", ai/3, g.x, g.y, g.z);
       atomicAdd(&grad[ai+0], g.x);
       atomicAdd(&grad[ai+1], g.y);
       atomicAdd(&grad[ai+2], g.z);

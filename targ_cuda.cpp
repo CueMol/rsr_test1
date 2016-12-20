@@ -5,8 +5,8 @@
 #include <qlib/Utils.hpp>
 #include <qlib/LExceptions.hpp>
 
-#include <gsl/gsl_multimin.h>
-#include <gsl/gsl_blas.h>
+//#include <gsl/gsl_multimin.h>
+//#include <gsl/gsl_blas.h>
 
 #include "minimize.hpp"
 #include "mol.hpp"
@@ -19,7 +19,7 @@
 #include "plan_cuda.hpp"
 #include "nonb_cuda.hpp"
 
-#define DEBUG_PRINT 1
+//#define DEBUG_PRINT 1
 
 using namespace std;
 using qlib::LString;

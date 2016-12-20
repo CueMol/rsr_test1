@@ -60,7 +60,7 @@ int main(int argc, char* argv[])
   //pMin->m_pMiniTarg->m_bAngl = true;
   //pMin->m_pMiniTarg->m_bChir = true;
   //pMin->m_pMiniTarg->m_bPlan = true;
-  pMin->m_pMiniTarg->m_bNonb = true;
+  //pMin->m_pMiniTarg->m_bNonb = true;
   //pMin->m_pMiniTarg->m_bMap = true;
   pMin->m_pMiniTarg->setup(pMol, pMap);
 
@@ -72,8 +72,8 @@ int main(int argc, char* argv[])
   {
     const std::vector<float> *pgrad;
     
-    //for (int i=0; i<1000; ++i) {
-    {
+    for (int i=0; i<1000; ++i) {
+    //{
       const std::vector<float> &grad = pMin->m_pMiniTarg->calc(dum);
       pgrad = &grad;
     }

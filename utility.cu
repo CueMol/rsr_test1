@@ -154,6 +154,10 @@ float4 mkevec(const Matrix3<float> &mat, float l1, float l2)
   return v1;
 }
 
+#ifndef M_PI
+# define M_PI 3.14159265358979323846
+#endif
+
 __device__ __inline__
 float4 mat33_diag(const Matrix3<float> &mat, float4 &evals)
 {

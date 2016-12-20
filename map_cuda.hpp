@@ -17,13 +17,13 @@ public:
   CuMapData();
   virtual ~CuMapData();
 
-  virtual void setup(MolData *pMol, DensityMap *pMap);
+  void setup(MolData *pMol, DensityMap *pMap);
   
-  virtual void setupCuda(CuComData *pComDat);
+  void setupCuda(CuComData *pComDat);
 
-  virtual void cleanupCuda();
+  void cleanupCuda();
   
-  virtual void calc();
+  void calc();
 
   // computation layout
   int m_nthr, m_nblk;
@@ -63,13 +63,13 @@ public:
   CuMap2Data();
   virtual ~CuMap2Data();
 
-  virtual void setup(MolData *pMol, DensityMap *pMap);
+  void setup(MolData *pMol, DensityMap *pMap);
 
-  virtual void setupCuda(CuComData *pComDat);
+  void setupCuda(CuComData *pComDat);
 
-  virtual void cleanupCuda();
+  void cleanupCuda();
   
-  virtual void calc();
+  void calc();
 
   // computation layout
   int m_nTotThr;

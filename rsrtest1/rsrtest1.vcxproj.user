@@ -3,11 +3,11 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LocalDebuggerEnvironment>PATH=$(PROJ64_DIR)bin;$(PROJ64_DIR)\cuemol2\winbuild\xul_$(Configuration)64;%PATH%</LocalDebuggerEnvironment>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
-    <LocalDebuggerCommandArguments>d:\tmp\mael.param d:\tmp\ml_001.pdb d:\tmp\ml_001_2mFo-DFc.map</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>$(PROJ64_DIR)\tmp\mael.param $(PROJ64_DIR)\tmp\ml_001.pdb $(PROJ64_DIR)\tmp\ml_001_2mFo-DFc.map</LocalDebuggerCommandArguments>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LocalDebuggerEnvironment>PATH=$(PROJ64_DIR)bin;$(PROJ64_DIR)\cuemol2\winbuild\xul_$(Configuration)64;%PATH%</LocalDebuggerEnvironment>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
-    <LocalDebuggerCommandArguments>d:\tmp\mael.param d:\tmp\ml_001.pdb d:\tmp\ml_001_2mFo-DFc.map</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>$(PROJ64_DIR)\tmp\mael.param $(PROJ64_DIR)\tmp\ml_001.pdb $(PROJ64_DIR)\tmp\ml_001_2mFo-DFc.map</LocalDebuggerCommandArguments>
   </PropertyGroup>
 </Project>
