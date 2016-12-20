@@ -81,8 +81,9 @@ struct Nonb
   std::vector<NonbElem> atoms;
 };
 
-struct MolData
+class MolData
 {
+public:
   int m_nAtoms;
   int m_nCrds;
 

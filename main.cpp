@@ -52,11 +52,11 @@ int main(int argc, char* argv[])
   Minimize *pMin = new MinLBFGS;
   //Minimize *pMin = new MinGSL;
 
-  pMin->m_bUseCUDA = true;
-  //pMin->m_bUseCUDA = false;
+  //pMin->m_bUseCUDA = true;
+  pMin->m_bUseCUDA = false;
   pMin->setup();
   
-  //pMin->m_pMiniTarg->m_bBond = true;
+  pMin->m_pMiniTarg->m_bBond = true;
   //pMin->m_pMiniTarg->m_bAngl = true;
   //pMin->m_pMiniTarg->m_bChir = true;
   //pMin->m_pMiniTarg->m_bPlan = true;

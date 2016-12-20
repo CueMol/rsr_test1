@@ -157,6 +157,7 @@
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(SolutionDir)..\liblbfgs</AdditionalIncludeDirectories>
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(SolutionDir)..\liblbfgs</AdditionalIncludeDirectories>
     </ClCompile>
+    <ClCompile Include="..\mol.cpp" />
     <ClCompile Include="..\RamaPlotData.cpp" />
     <ClCompile Include="..\targ_cpu.cpp" />
     <ClCompile Include="..\targ_cpu_angl.cpp" />
@@ -164,6 +165,7 @@
     <ClCompile Include="..\targ_cpu_chir.cpp" />
     <ClCompile Include="..\targ_cpu_dihe.cpp" />
     <ClCompile Include="..\targ_cpu_map.cpp" />
+    <ClCompile Include="..\targ_cpu_nonb.cpp" />
     <ClCompile Include="..\targ_cpu_plan.cpp" />
     <ClCompile Include="..\targ_cpu_rama.cpp" />
   </ItemGroup>

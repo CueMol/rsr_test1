@@ -13,8 +13,9 @@ using qlib::Vector4D;
 
 typedef qlib::VectorND<3, int> Vector3I;
 
-struct DensityMap
+class DensityMap
 {
+public:
   /// cell dimensions
   double m_cella;
   double m_cellb;
