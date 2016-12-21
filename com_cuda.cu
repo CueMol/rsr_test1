@@ -5,6 +5,7 @@
 
 #include <vector>
 #include <stdio.h>
+#include <cuda.h>
 
 #include "com_cuda.hpp"
 
@@ -20,6 +21,26 @@ void CuComData::setup(int natom)
 
   if (pd_crds!=NULL)
     cleanup();
+
+  cuInit(0);
+
+  int cuDevice = 0;
+  int deviceCount = 0;
+  cuDeviceGetCount(&deviceCount);
+
+  if (deviceCount == 0) {
+    fprintf(stderr, "cudaDeviceInit error: no devices supporting CUDA\n");
+    exit(0);
+  }
+
+  
+  int dev = 0;
+  cuDeviceGet(&cuDevice, dev);
+  char name[100];
+  cuDeviceGetName(name, 100, cuDevice);
+
+  printf("> Using CUDA Device [%d]: %s\n", dev, name);
+  cudaSetDevice(dev);
 
   // setup exec layout
   calcThrBlk(natom, &m_nthr, &m_nblk, &m_nDevAtom);

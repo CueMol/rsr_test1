@@ -4,7 +4,16 @@
 
 NVCC=nvcc
 
-NVCCFLAGS=-gencode arch=compute_30,code=sm_30
+NVCC_GENCODE= \
+  -gencode=arch=compute_30,code=sm_30 \
+  -gencode=arch=compute_35,code=sm_35 \
+  -gencode=arch=compute_50,code=sm_50 \
+  -gencode=arch=compute_52,code=sm_52 \
+  -gencode=arch=compute_60,code=sm_60 \
+  -gencode=arch=compute_61,code=sm_61 \
+  -gencode=arch=compute_61,code=compute_61
+
+NVCCFLAGS=$(NVCC_GENCODE)
 #NVCCFLAGS=--ftz=true --prec-div=false --prec-sqrt=false --fmad=true
 #NVCCFLAGS=--ftz=false --prec-div=true --prec-sqrt=true --fmad=false
 
@@ -48,23 +57,32 @@ $(NULL)
 
 # targ_cuda.o
 
+CUEMOL_BUILD=/net3/ishitani/proj/cuemol2
+#CUEMOL_BUILD=$(HOME)/proj/cuemol2_uxcli
+CUEMOL_LIB=/net3/ishitani/app64/cuemol2/lib
+#CUEMOL_LIB=$(HOME)/app/cuemol2/lib
+
+#GSL_INCLUDE=-I$(HOME)/app/gsl/include
+GSL_INCLUDE=
+#GSL_LDFLAGS=-Wl,-rpath $(HOME)/app/gsl/lib -L$(HOME)/app/gsl/lib 
+GSL_LDFLAGS=
+
 CFLAGS=-g \
   -DHAVE_CUDA \
   -DHAVE_GSL \
   -Iliblbfgs \
-  -I$(HOME)/proj/cuemol2_uxcli/src \
-  -I$(HOME)/proj/cuemol2_uxcli/uxbuild \
-  -I$(HOME)/app/gsl/include
-
+  -I/src \
+  -I$(CUEMOL_BUILD)/uxbuild \
+  -I$(CUEMOL_BUILD)/src \
+  $(GSL_INCLUDE)
 
 CXXFLAGS= $(CFLAGS) \
   -std=c++0x -DHAVE_CONFIG_H \
 
 LDFLAGS= \
-  -Wl,-rpath $(HOME)/app/cuemol2/lib \
-  -L$(HOME)/app/cuemol2/lib \
-  -Wl,-rpath $(HOME)/app/gsl/lib \
-  -L$(HOME)/app/gsl/lib 
+  -Wl,-rpath $(CUEMOL_LIB) \
+  -L$(CUEMOL_LIB) \
+  $(GSL_LDFLAGS)
 
 LDADD=-lqlib \
 -lgsl -lgslcblas
