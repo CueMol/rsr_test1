@@ -57,10 +57,10 @@ int main(int argc, char* argv[])
   pMin->setup();
   
   pMin->m_pMiniTarg->m_bBond = true;
-  //pMin->m_pMiniTarg->m_bAngl = true;
+  pMin->m_pMiniTarg->m_bAngl = true;
   //pMin->m_pMiniTarg->m_bChir = true;
-  //pMin->m_pMiniTarg->m_bPlan = true;
-  //pMin->m_pMiniTarg->m_bNonb = true;
+  pMin->m_pMiniTarg->m_bPlan = true;
+  pMin->m_pMiniTarg->m_bNonb = true;
   //pMin->m_pMiniTarg->m_bMap = true;
   pMin->m_pMiniTarg->setup(pMol, pMap);
 
