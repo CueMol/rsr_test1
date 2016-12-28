@@ -52,8 +52,8 @@ int main(int argc, char* argv[])
   Minimize *pMin = new MinLBFGS;
   //Minimize *pMin = new MinGSL;
 
-  //pMin->m_bUseCUDA = true;
-  pMin->m_bUseCUDA = false;
+  pMin->m_bUseCUDA = true;
+  //pMin->m_bUseCUDA = false;
   pMin->setup();
   
   pMin->m_pMiniTarg->m_bBond = true;
@@ -61,7 +61,8 @@ int main(int argc, char* argv[])
   //pMin->m_pMiniTarg->m_bChir = true;
   pMin->m_pMiniTarg->m_bPlan = true;
   pMin->m_pMiniTarg->m_bNonb = true;
-  //pMin->m_pMiniTarg->m_bMap = true;
+  pMin->m_pMiniTarg->m_bMap = true;
+
   pMin->m_pMiniTarg->setup(pMol, pMap);
 
   pMin->m_nMaxIter = 10000;
@@ -72,8 +73,9 @@ int main(int argc, char* argv[])
   {
     const std::vector<float> *pgrad;
     
+    //for (;;) {
     for (int i=0; i<1000; ++i) {
-    //{
+      //{
       const std::vector<float> &grad = pMin->m_pMiniTarg->calc(dum);
       pgrad = &grad;
     }

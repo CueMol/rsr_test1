@@ -64,6 +64,8 @@ void BondGradKern2(const float* crds, const CuBond* param,
   else
     flag = 1.0f;
 
+  //printf("bond ithr %d\n", ithr);
+
   const int ibon = (ithr<nbonds)?ithr:0;
 
   const CuBond *pbon = &param[ibon];
@@ -93,26 +95,17 @@ void BondGradKern2(const float* crds, const CuBond* param,
   float sum = blockReduceSum(pbon->kf * ss * ss);
 
   const int tid = threadIdx.x;
-  /*
-  extern __shared__ float sdata[];
-  sdata[tid] = pbon->kf * ss * ss;
-
-  __syncthreads();
-
-  for (unsigned int s=1; s < blockDim.x; s *= 2)  {
-    int index = 2 * s * tid;
-    if (index < blockDim.x) {
-      sdata[index] += sdata[index + s];
-    }
-    __syncthreads();
-  }
-  */
 
   if (tid == 0) {
     //atomicAdd(&grad[ncrds + 0], sdata[0]);
     //atomicAdd(&grad[ncrds + blockIdx.x], sum);
     grad[ncrds+blockIdx.x] += sum;
   }
+}
+
+__global__
+void DummyKern2(const float* crds, const CuBond* param, float *grad)
+{
 }
 
 void CuBondData::calc2()
@@ -122,15 +115,21 @@ void CuBondData::calc2()
   const int natom = m_nAtoms;
   const int nbond = param.size();
 
-  const int nshmem = m_nthr*sizeof(float);
+  //const int nshmem = m_nthr*sizeof(float);
 
-  BondGradKern2<<<m_nblk, m_nthr, nshmem>>>
+  //printf("GetLastError: %s\n", cudaGetErrorString(cudaGetLastError()));
+
+  BondGradKern2<<<m_nblk, m_nthr>>>
     (m_pComDat->pd_crds, pd_bond, m_pComDat->pd_grad, natom*3, nbond);
 
+  //DummyKern2<<<1,1>>>
+  //(m_pComDat->pd_crds, pd_bond, m_pComDat->pd_grad);
+
 #ifdef DEBUG_PRINT
-  printf("kern exec OK\n");
+  printf("GetLastError: %s\n", cudaGetErrorString(cudaGetLastError()));
 
   // XX
+  std::vector<float> grad(natom*3 + GRAD_PAD);
   m_pComDat->xferGrad(grad);
   for (int i=0; i<natom; ++i) {
     printf("grad %d: %f %f %f\n", i, grad[i*3+0], grad[i*3+1], grad[i*3+2]);
